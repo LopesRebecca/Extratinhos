@@ -1,0 +1,6 @@
+@Extratinhos_HostAddress = http://localhost:5188
+
+GET {{Extratinhos_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
