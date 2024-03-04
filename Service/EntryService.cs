@@ -21,11 +21,20 @@ public class EntryService
             Value = request.Value,
             Type = request.Type == "c" ? EntryType.CREDIT : EntryType.DEBIT,
             Description = request.Description,
-            ClientId = Id
+            ClientId = Id,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
 
         _entrysRepository.Insert(entry).Save();
 
         return entry;
     }
+
+    public Entry GetEntryByClientId(long Id)
+    {
+        return _entrysRepository.GetByClientId(Id);
+    }
+
+
 }

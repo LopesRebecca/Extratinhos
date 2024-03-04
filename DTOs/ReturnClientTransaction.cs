@@ -2,7 +2,7 @@
 
 namespace Extratinhos.DTOs;
 
-public class RerturnClientTransaction
+public class ReturnClientTransaction
 {
     [JsonPropertyName("limite")]
     public long Limit { get; set; }

@@ -62,7 +62,7 @@ public class ClientController : ControllerBase
     }
 
     [HttpPost("{Id:long}/trasacoes")]
-    public ActionResult<RerturnClientTransaction> CreateEntry([FromBody] EntryRequest request, long Id)
+    public ActionResult<ReturnClientTransaction> CreateEntry([FromBody] EntryRequest request, long Id)
     {
         if (!ModelState.IsValid || Id is 0) { return BadRequest(ModelState); }
 
@@ -74,10 +74,32 @@ public class ClientController : ControllerBase
         var entry = _entryService.CreateEntry(request, client.Id);
         var balance = _balanceService.CreateBalance(client.Id, (client.Limit - entry.Value));
 
-        RerturnClientTransaction result = new RerturnClientTransaction()
+        ReturnClientTransaction result = new ReturnClientTransaction()
         {
             Balance = balance.Value,
             Limit = client.Limit
+        };
+
+        return Ok(result);
+    }
+
+    [HttpPost("{Id:long}/extrato")]
+    public ActionResult<ReturnClientTransaction> GetBalance(long Id)
+    {
+        if (!ModelState.IsValid || Id is 0) { return BadRequest(ModelState); }
+
+        var client = _clientService.GetClientById(Id);
+
+        if (client is null)
+            throw new ArgumentOutOfRangeException("Client not found");
+
+        var entry = _entryService.GetEntryByClientId(client.Id);
+        var balance = _balanceService.GetBalanceByClientId(client.Id);
+
+        ReturnBalanceClient result = new ReturnBalanceClient()
+        {
+            entry = entry,
+            balance = balance
         };
 
         return Ok(result);

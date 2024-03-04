@@ -39,4 +39,7 @@ public class EntrysRepository : IRepository<Entry>
         _context.Entries.Update(entity);
         return this;
     }
+
+    public Entry? GetByClientId(long id)
+        => _context.Entries.FirstOrDefault(x => x.ClientId == id);
 }

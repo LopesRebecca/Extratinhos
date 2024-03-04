@@ -39,4 +39,7 @@ public class BalanceRepository : IRepository<Balance>
         _context.Balances.Update(entity);
         return this;
     }
+
+    public Balance? GetByClientId(long id)
+        => _context.Balances.FirstOrDefault(x => x.ClientId == id);
 }

@@ -17,11 +17,18 @@ public class BalanceService
         Balance balance = new()
         {
             Value = Value,
-            ClientId = Id 
+            ClientId = Id,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
 
         _balanceRepository.Insert(balance).Save();
 
         return balance;
+    }
+
+    public Balance GetBalanceByClientId(long Id)
+    {
+        return _balanceRepository.GetByClientId(Id);
     }
 }
