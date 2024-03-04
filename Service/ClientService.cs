@@ -1,4 +1,5 @@
 ﻿using extratinhos.api.Repositories;
+using Extratinhos.DTOs;
 using Extratinhos.Entities;
 
 namespace Extratinhos.Service
@@ -6,14 +7,23 @@ namespace Extratinhos.Service
     public class ClientService
     {
         private readonly ClientRepository _clientRepository;
+        private readonly EntrysRepository _entrysRepository;
+        private readonly BalanceRepository _balanceRepository;
 
         public ClientService(ClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
         }
 
-        public Client CreateClient(Client client)
+        public Client CreateClient(ClientRequest request)
         {
+            Client client = new Client()
+            {
+                Limit = request.Limit,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
             _clientRepository.Insert(client).Save();
 
             return client;

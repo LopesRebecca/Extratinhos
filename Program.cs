@@ -15,8 +15,6 @@ builder.Services.AddSwaggerGen();
 
 string connection = builder.Configuration?.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ExtratinhoContext>(ServiceLifetime.Scoped);
-
 builder.Services.AddDbContext<ExtratinhoContext>(Op => Op.UseSqlServer(connection));
 
 builder.Services.AddControllers().AddJsonOptions(options =>

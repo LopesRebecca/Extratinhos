@@ -5,6 +5,6 @@ namespace Extratinhos.DTOs;
 
 public class ClientRequest
 {
-    [JsonPropertyName("valor Limite")]
+    [JsonPropertyName("limite")]
     public long Limit { get; set; }
 }

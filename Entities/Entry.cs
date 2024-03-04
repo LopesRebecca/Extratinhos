@@ -1,5 +1,6 @@
 ﻿using Extratinhos.Entities.Base;
 using Extratinhos.Entities.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Extratinhos.Entities;
 
@@ -11,6 +12,7 @@ public class Entry : BaseEntity
 
     public string? Description { get; set; }
 
+    [ForeignKey("ClientId")]
     public long ClientId { get; set; }
 
     public Client? Client { get; set; } = null;
