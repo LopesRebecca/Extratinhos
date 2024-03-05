@@ -42,4 +42,14 @@ public class EntrysRepository : IRepository<Entry>
 
     public Entry? GetByClientId(long id)
         => _context.Entries.FirstOrDefault(x => x.ClientId == id);
+
+
+    public IEnumerable<Entry> GetEntriesPaginatedByClientId(long clientId, int index = 10, int totalItens = 10)
+    {
+        return _context.Entries
+            .Where(x => x.ClientId == clientId)
+            .OrderByDescending(x => x.CreatedAt)
+            .Skip(index)
+            .Take(totalItens);
+    }
 }

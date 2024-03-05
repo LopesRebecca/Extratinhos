@@ -1,6 +1,8 @@
 ﻿using Extratinhos.Context;
 using Extratinhos.DTOs;
+using Extratinhos.DTOs.Response;
 using Extratinhos.Entities;
+using Extratinhos.Exceptions;
 using Extratinhos.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +19,8 @@ public class ClientController : ControllerBase
     public ClientController(ExtratinhoContext context)
     {
         _clientService = new ClientService(new extratinhos.api.Repositories.ClientRepository(context));
-        _entryService = new EntryService(new extratinhos.api.Repositories.EntrysRepository(context));
-        _balanceService = new BalanceService(new extratinhos.api.Repositories.BalanceRepository(context));
+        _entryService = new EntryService(context);
+        _balanceService = new BalanceService(context);
 
     }
 
@@ -62,44 +64,63 @@ public class ClientController : ControllerBase
     }
 
     [HttpPost("{Id:long}/trasacoes")]
-    public ActionResult<ReturnClientTransaction> CreateEntry([FromBody] EntryRequest request, long Id)
+    public ActionResult<ClientTransactionResponse> CreateEntry([FromBody] EntryRequest request, long Id)
     {
-        if (!ModelState.IsValid || Id is 0) { return BadRequest(ModelState); }
-
-        var client = _clientService.GetClientById(Id);
-
-        if (client is null)
-            throw new ArgumentOutOfRangeException("Client not found");
-
-        var entry = _entryService.CreateEntry(request, client.Id);
-        var balance = _balanceService.CreateBalance(client.Id, (client.Limit - entry.Value));
-
-        ReturnClientTransaction result = new ReturnClientTransaction()
+        try
         {
-            Balance = balance.Value,
-            Limit = client.Limit
-        };
+            if (!ModelState.IsValid || Id is 0) { return BadRequest(ModelState); }
 
-        return Ok(result);
+            var client = _clientService.GetClientById(Id);
+
+            if (client is null)
+                return StatusCode(404, new { msg = "Client not found" });
+
+            var _entryType = request.Type.First();
+            if (_entryType != 'c' && _entryType != 'd')
+                return StatusCode(422, new { msg = "a" });
+
+
+            if (request.Description.Length > 10)
+                return StatusCode(422, new { msg = "b" });
+
+            var entry = _entryService.CreateEntry(request, client);
+            var balance = _balanceService.CreateBalance(request, client, (client.Limit - entry.Value));
+
+            var result = new ClientBalanceResponse()
+            {
+                Balance = balance.Value,
+                Limit = client.Limit
+            };
+
+            return Ok(result);
+        }
+        catch(LimitException ex)
+        {
+            return StatusCode(422, new { msg = "b" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("{Id:long}/extrato")]
-    public ActionResult<ReturnClientTransaction> GetBalance(long Id)
+    public ActionResult<ClientTransactionResponse> GetBalance(long Id)
     {
         if (!ModelState.IsValid || Id is 0) { return BadRequest(ModelState); }
 
         var client = _clientService.GetClientById(Id);
 
         if (client is null)
-            throw new ArgumentOutOfRangeException("Client not found");
+            return StatusCode(404, new { msg = "Client not found" });
 
-        var entry = _entryService.GetEntryByClientId(client.Id);
-        var balance = _balanceService.GetBalanceByClientId(client.Id);
+        var entry = _entryService.GetEntriesPaginatedByClientId(client.Id);
+        var balance = _balanceService.GererateBalanceResponseByClient(client.Id);
 
-        ReturnBalanceClient result = new ReturnBalanceClient()
+        var result = new ClientTransactionResponse()
         {
-            entry = entry,
-            balance = balance
+            Entries = entry.ToList(),
+            Balance = balance
         };
 
         return Ok(result);

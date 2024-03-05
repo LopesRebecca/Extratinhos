@@ -41,5 +41,5 @@ public class BalanceRepository : IRepository<Balance>
     }
 
     public Balance? GetByClientId(long id)
-        => _context.Balances.FirstOrDefault(x => x.ClientId == id);
+        => _context.Balances.Include(x=> x.Client).FirstOrDefault(x => x.ClientId == id);
 }
