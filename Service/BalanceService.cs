@@ -13,13 +13,11 @@ namespace Extratinhos.Service;
 public class BalanceService
 {
     private readonly BalanceRepository _balanceRepository;
-    private readonly ClientRepository _clientRepository;
 
 
     public BalanceService(ExtratinhoContext context)
     {
         _balanceRepository = new BalanceRepository(context);
-        _clientRepository = new ClientRepository(context);
     }
 
     public Balance CreateBalance(EntryRequest request, Client client, long Value)
@@ -41,7 +39,7 @@ public class BalanceService
             };
         }
 
-        if (request.Equals('d'))
+        if (request.Type.Equals("d"))
         {
             balance.Value -= request.Value;
 
